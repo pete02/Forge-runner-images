@@ -1,0 +1,24 @@
+
+version: "3.8"
+
+services:
+  go-ci:
+    image: ${DOCKERHUB_USERNAME:-lumilukko}/go-ci:${IMAGE_TAG:-latest}
+    build:
+      context: ./ci-images/go
+      dockerfile: Dockerfile
+      args:
+        GO_VERSION: ${GO_VERSION:-1.25.3}
+        GOLANGCI_LINT_VERSION: ${GOLANGCI_LINT_VERSION:-1.64.8}
+
+  rust-ci:
+    image: ${DOCKERHUB_USERNAME:-lumilukko}/rust-ci:${IMAGE_TAG:-latest}
+    build:
+      context: ./ci-images/rust
+      dockerfile: Dockerfile
+
+  nixos-ci:
+    image: ${DOCKERHUB_USERNAME:-lumilukko}/nixos-ci:${IMAGE_TAG:-latest}
+    build:
+      context: ./ci-images/nixos
+      dockerfile: Dockerfile
