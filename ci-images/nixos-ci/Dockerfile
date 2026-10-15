@@ -3,10 +3,10 @@ FROM nixos/nix:latest
 
 ENV NIX_CONFIG="experimental-features = nix-command flakes"
 
-RUN nix-env -iA \
-    nixpkgs.nodejs_20 \
-    nixpkgs.git
-
+RUN nix --extra-experimental-features 'nix-command flakes' profile install \
+    nixpkgs#nodejs \
+    nixpkgs#git
+    
 RUN nix --version \
     && git --version
 
