@@ -1,6 +1,7 @@
 name: Publish CI images
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
