@@ -47,9 +47,23 @@ jobs:
 
       - name: Push latest images
         run: |
-          docker-compose \
-            -f docker-compose.ci-images.yml \
-            push
+          for image in go-ci rust-ci nixos-ci; do
+            docker image push \
+              --platform linux/amd64 \
+              "$DOCKERHUB_USERNAME/$image:latest"
+          done
+
+      - name: Tag images with commit SHA
+        run: |
+          for image in go-ci rust-ci nixos-ci docker-ci; do
+            docker tag \
+              "$DOCKERHUB_USERNAME/$image:latest" \
+              "$DOCKERHUB_USERNAME/$image:$GITHUB_SHA"
+
+            docker image push \
+              --platform linux/amd64 \
+              "$DOCKERHUB_USERNAME/$image:$GITHUB_SHA"
+          done
 
       - name: Tag images with commit SHA
         run: |

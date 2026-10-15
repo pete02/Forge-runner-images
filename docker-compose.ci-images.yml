@@ -23,3 +23,9 @@ services:
       context: ./ci-images/nixos
       dockerfile: Dockerfile
 
+  docker-ci:
+    image: lumilukko/docker-ci:latest
+    build:
+      context: ./ci-images/docker
+      dockerfile: Dockerfile
+
