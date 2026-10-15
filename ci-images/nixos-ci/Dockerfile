@@ -1,4 +1,3 @@
-```dockerfile
 FROM nixos/nix:latest
 
 RUN mkdir -p /etc/nix \
@@ -25,4 +24,3 @@ WORKDIR /workspace
 
 ENTRYPOINT []
 CMD ["/bin/sh"]
-```
