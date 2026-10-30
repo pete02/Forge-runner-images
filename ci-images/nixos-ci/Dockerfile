@@ -12,13 +12,18 @@ RUN mkdir -p /tmp/ci-tools-flake /opt \
     && printf '%s\n' \
       '{' \
       '  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";' \
-      '  outputs = { self, nixpkgs }: {' \
-      '    packages.x86_64-linux.default = let' \
-      '      pkgs = import nixpkgs { system = "x86_64-linux"; };' \
-      '    in pkgs.buildEnv {' \
-      '      name = "ci-tools";' \
-      '      paths = [ pkgs.nodejs pkgs.git pkgs.attic-client ];' \
-      '    };' \
+      '  outputs = { self, nixpkgs }: let' \
+      '    systems = [ "x86_64-linux" "aarch64-linux" ];' \
+      '    forAllSystems = nixpkgs.lib.genAttrs systems;' \
+      '  in {' \
+      '    packages = forAllSystems (system: let' \
+      '      pkgs = nixpkgs.legacyPackages.${system};' \
+      '    in {' \
+      '      default = pkgs.buildEnv {' \
+      '        name = "ci-tools";' \
+      '        paths = [ pkgs.nodejs pkgs.git pkgs.attic-client ];' \
+      '      };' \
+      '    });' \
       '  };' \
       '}' > /tmp/ci-tools-flake/flake.nix \
     && nix build /tmp/ci-tools-flake#default \
