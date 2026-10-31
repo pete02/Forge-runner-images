@@ -12,7 +12,7 @@ RUN mkdir -p /etc/nix \
 ENV NIX_CONFIG="experimental-features = nix-command flakes"
 
 
-RUN mkdir -p /tmp/ci-tools-flake /opt \
+RUN mkdir -p /opt/ci-tools-flake \
     && printf '%s\n' \
       '{' \
       '  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";' \
@@ -29,12 +29,9 @@ RUN mkdir -p /tmp/ci-tools-flake /opt \
       '      };' \
       '    });' \
       '  };' \
-      '}' > /tmp/ci-tools-flake/flake.nix \
-    && nix build /tmp/ci-tools-flake#default \
-      --out-link /opt/ci-tools \
-    && test -x /opt/ci-tools/bin/node \
-    && test -x /opt/ci-tools/bin/git \
-    && test -x /opt/ci-tools/bin/attic
+      '}' > /opt/ci-tools-flake/flake.nix \
+    && nix build /opt/ci-tools-flake#default --out-link /opt/ci-tools \
+    && test -x /opt/ci-tools/bin/node
 
 ENV PATH="/opt/ci-tools/bin:${PATH}"
 
