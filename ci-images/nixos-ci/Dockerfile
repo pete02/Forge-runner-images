@@ -9,7 +9,7 @@ RUN mkdir -p /etc/nix \
       >> /etc/nix/nix.conf
 
 
-ENV NIX_CONFIG="experimental-features = nix-command flakes
+ENV NIX_CONFIG="experimental-features = nix-command flakes"
 
 
 RUN mkdir -p /tmp/ci-tools-flake /opt \
