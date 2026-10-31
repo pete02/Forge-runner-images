@@ -10,8 +10,7 @@ RUN mkdir -p /etc/nix \
 
 
 ENV NIX_CONFIG="experimental-features = nix-command flakes
-connect-timeout = 3
-fallback = true"
+
 
 RUN mkdir -p /tmp/ci-tools-flake /opt \
     && printf '%s\n' \
