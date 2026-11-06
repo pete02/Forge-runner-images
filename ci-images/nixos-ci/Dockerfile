@@ -17,7 +17,7 @@ RUN mkdir -p /opt/ci-tools-flake \
       '{' \
       '  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";' \
       '  outputs = { self, nixpkgs }: let' \
-      '    systems = [ "x86_64-linux" "aarch64-linux" ];' \
+      '    systems = [ "x86_64-linux" "aarch64-linux" "i686-linux"];' \
       '    forAllSystems = nixpkgs.lib.genAttrs systems;' \
       '  in {' \
       '    packages = forAllSystems (system: let' \
