@@ -29,9 +29,8 @@ RUN mkdir -p /opt/ci-tools-flake \
       '  };' \
       '}' > /opt/ci-tools-flake/flake.nix \
     && nix build /opt/ci-tools-flake#default --out-link /opt/ci-tools \
-    && mkdir -p /opt/ci-tools-real /usr/local/bin \
-    && cp -rL /opt/ci-tools/bin/* /opt/ci-tools-real/ \
-    && for b in /opt/ci-tools-real/*; do \
+    && mkdir -p /usr/local/bin \
+    && for b in /opt/ci-tools/bin/*; do \
          ln -sf "$b" "/usr/local/bin/$(basename "$b")"; \
        done \
     && test -x /usr/local/bin/node
