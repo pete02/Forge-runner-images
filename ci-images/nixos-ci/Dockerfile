@@ -33,7 +33,11 @@ RUN mkdir -p /opt/ci-tools-flake \
     && nix build /opt/ci-tools-flake#default --out-link /opt/ci-tools \
     && test -x /opt/ci-tools/bin/node
 
-ENV PATH="/opt/ci-tools/bin:${PATH}"
+RUN mkdir -p /opt/bootstrap/bin \
+    && cp -L "$(nix build github:NixOS/nixpkgs/nixos-unstable#pkgsStatic.busybox --no-link --print-out-paths)/bin/busybox" /opt/bootstrap/bin/busybox \
+    && for c in tail sh env cat sleep; do ln -s busybox /opt/bootstrap/bin/$c; done
+
+ENV PATH="/opt/ci-tools/bin:${PATH}:/opt/bootstrap/bin"
 
 WORKDIR /workspace
 
