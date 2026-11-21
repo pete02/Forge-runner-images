@@ -1,6 +1,5 @@
 FROM nixos/nix:latest
 
-# Only generic settings here. No hostnames, keys or tokens.
 RUN mkdir -p /etc/nix \
     && printf '%s\n' \
       'experimental-features = nix-command flakes' \
@@ -23,18 +22,17 @@ RUN mkdir -p /opt/ci-tools-flake \
       '    in {' \
       '      default = pkgs.buildEnv {' \
       '        name = "ci-tools";' \
-      '        paths = [ pkgs.nodejs pkgs.git pkgs.attic-client ];' \
+      '        paths = with pkgs; [' \
+      '          nodejs git attic-client bash coreutils curl' \
+      '          gnugrep gnused findutils gnutar gzip xz cacert' \
+      '        ];' \
       '      };' \
       '    });' \
       '  };' \
       '}' > /opt/ci-tools-flake/flake.nix \
-    && nix build /opt/ci-tools-flake#default --out-link /opt/ci-tools \
-    && mkdir -p /usr/local/bin \
-    && for b in /opt/ci-tools/bin/*; do \
-         ln -sf "$b" "/usr/local/bin/$(basename "$b")"; \
-       done \
-    && test -x /usr/local/bin/node
+    && nix build /opt/ci-tools-flake#default --out-link /opt/ci-tools
 
+# Static busybox for the runner's bootstrap commands (lives outside /nix on purpose)
 RUN mkdir -p /opt/bootstrap/bin /bin \
     && cp -L "$(nix build github:NixOS/nixpkgs/nixos-unstable#pkgsStatic.busybox --no-link --print-out-paths)/bin/busybox" /opt/bootstrap/bin/busybox \
     && for c in tail sh env cat sleep; do \
@@ -42,9 +40,19 @@ RUN mkdir -p /opt/bootstrap/bin /bin \
          ln -sf /opt/bootstrap/bin/busybox "/bin/$c"; \
        done
 
+# Expose nix and the CI tools on PATH
+RUN mkdir -p /usr/local/bin \
+    && for b in /nix/var/nix/profiles/default/bin/* /opt/ci-tools/bin/*; do \
+         [ -e "$b" ] && ln -sf "$b" "/usr/local/bin/$(basename "$b")"; \
+       done
+
 ENV PATH="/usr/local/bin:/opt/ci-tools/bin:/opt/bootstrap/bin:${PATH}"
+ENV SSL_CERT_FILE=/opt/ci-tools/etc/ssl/certs/ca-bundle.crt
+
+# Fail the image build, not the pipeline, if anything is missing
+RUN node --version && nix --version && git --version && attic --version \
+    && bash --version | head -n1 && curl --version | head -n1
 
 WORKDIR /workspace
-
 ENTRYPOINT []
 CMD ["/bin/sh"]
