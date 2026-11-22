@@ -47,11 +47,15 @@ RUN mkdir -p /usr/local/bin \
        done
 
 ENV PATH="/usr/local/bin:/opt/ci-tools/bin:/opt/bootstrap/bin:${PATH}"
-ENV SSL_CERT_FILE=/opt/ci-tools/etc/ssl/certs/ca-bundle.crt
+ENV SSL_CERT_FILE=/opt/ci-tools/etc/ssl/certs/ca-bundle.crt \
+    NIX_SSL_CERT_FILE=/opt/ci-tools/etc/ssl/certs/ca-bundle.crt \
+    GIT_SSL_CAINFO=/opt/ci-tools/etc/ssl/certs/ca-bundle.crt
 
 # Fail the image build, not the pipeline, if anything is missing
 RUN node --version && nix --version && git --version && attic --version \
-    && bash --version | head -n1 && curl --version | head -n1
+    && bash --version | head -n1 && curl --version | head -n1 \
+    && test -s "$GIT_SSL_CAINFO" && test -s "$NIX_SSL_CERT_FILE" && test -s "$SSL_CERT_FILE" \
+    && test -x "$(readlink -f /opt/ci-tools)/bin/git"
 
 WORKDIR /workspace
 ENTRYPOINT []
