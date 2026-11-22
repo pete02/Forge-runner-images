@@ -57,6 +57,8 @@ RUN node --version && nix --version && git --version && attic --version \
     && test -s "$GIT_SSL_CAINFO" && test -s "$NIX_SSL_CERT_FILE" && test -s "$SSL_CERT_FILE" \
     && test -x "$(readlink -f /opt/ci-tools)/bin/git"
 
+RUN ln -sfn "$(readlink -f /nix/var/nix/profiles/default)" /nix/var/nix/gcroots/nix-profile-root
+
 WORKDIR /workspace
 ENTRYPOINT []
 CMD ["/bin/sh"]
